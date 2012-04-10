@@ -14,22 +14,8 @@ module ActiveRecord
 
       def duplicate
         return unless self.class.duplicatable
-           
+        
         dup.tap do |duplicate|
-          # Duplicate all belongs_to associations.
-          self.class.reflect_on_all_associations(:belongs_to).each do |association|
-            duplicate.send(:"#{association.name}=", send(association.name))
-          end
-          
-          # Duplicate all has_many associations which include Duplicate too.
-          self.class.reflect_on_all_associations(:has_many).each do |association|
-            send(association.name).all.to_a.each do |object|
-              object.duplicate.tap do |object|
-                duplicate.send(association.name) << object if object
-              end
-            end
-          end
-          
           attributes.each do |key, value|
             value = case true
             
@@ -46,6 +32,20 @@ module ActiveRecord
             end
             
             duplicate.send(:"#{key}=", value)
+          end
+          
+          # Duplicate all belongs_to associations.
+          self.class.reflect_on_all_associations(:belongs_to).each do |association|
+            duplicate.send(:"#{association.name}=", send(association.name))
+          end
+          
+          # Duplicate all has_many associations.
+          self.class.reflect_on_all_associations(:has_many).each do |association|
+            send(association.name).all.to_a.each do |object|
+              object.duplicate.tap do |object|
+                duplicate.send(association.name) << object if object
+              end
+            end
           end
         end
       end

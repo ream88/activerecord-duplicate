@@ -90,4 +90,15 @@ describe 'Integration' do
       post.comments.size.must_equal(0)
     end
   end
+
+
+  describe 'duplicating post' do
+    it 'sets blog association' do
+      post = blog.posts.create
+      
+      post = post.duplicate
+      
+      post.blog.must_equal(blog)
+    end
+  end
 end
