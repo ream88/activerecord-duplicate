@@ -1,3 +1,5 @@
+## ActsAsDuplicator [![Build Status](https://secure.travis-ci.org/haihappen/acts_as_duplicator.png)](http://travis-ci.org/haihappen/acts_as_duplicator)
+
 Duplicating ActiveRecords is easy again. All you have to do:
 
 ```ruby
