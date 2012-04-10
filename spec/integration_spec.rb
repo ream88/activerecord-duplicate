@@ -2,12 +2,16 @@ require File.expand_path('../spec_helper', __FILE__)
 
 describe 'Integration' do
   before do
-    ActiveRecord::Schema.define do      
-      create_table :blogs
+    ActiveRecord::Schema.define do
+      create_table :blogs do |t|
+        t.string :title
+      end
       
       create_table :posts do |t|
         t.belongs_to :blog
+        t.string     :title
         t.text       :content
+        t.boolean    :is_copyrighted
         t.timestamp  :published_at
       end
       
@@ -28,8 +32,8 @@ describe 'Integration' do
       
       attr_duplicatable :content
       
-      # Don't duplicate empty posts
-      before_duplication { self.content.present? }
+      # Don't duplicate copyrighted posts
+      before_duplication { !self.is_copyrighted? }
     end
     
     class Comment < ActiveRecord::Base
@@ -39,7 +43,7 @@ describe 'Integration' do
     end
   end
 
-  let(:blog) { Blog.create }
+  let(:blog) { Blog.create(title: 'Blog') }
 
   describe 'duplicating blog' do
     subject { blog.duplicate }
@@ -60,14 +64,14 @@ describe 'Integration' do
 
 
     it 'ignores empty posts' do
-      3.times { |i| blog.posts.create(content: i == 2 ? nil : 'Lorem') }
+      3.times { |i| blog.posts.create(content: 'Lorem', is_copyrighted: i == 0) }
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(2)
     end
 
 
-    it 'ignores posts published_at timestamp' do
+    it 'ignores posts copyright flag' do
       post = blog.posts.create(content: 'Lorem', published_at: Time.now)
       
       post = subject.posts.first
