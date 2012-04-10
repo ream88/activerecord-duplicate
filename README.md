@@ -41,6 +41,8 @@ post.duplicate
 
 ## Installation
 
+Tested against Ruby versions `1.9.2`, `1.9.3`, `ruby-head` and Rails versions `3.1.x`, `3.2.x`, `master` (upcoming Rails `4.0.0`).
+
 In your `Gemfile`:
 
 ```ruby
