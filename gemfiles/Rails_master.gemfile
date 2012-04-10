@@ -1,0 +1,10 @@
+source :rubygems
+
+gem 'activerecord', git: 'git://github.com/rails/rails.git'
+
+group :development do
+  gem 'minitest'
+  gem 'purdytest'
+  gem 'rails', git: 'git://github.com/rails/rails.git'
+  gem 'sqlite3'
+end
