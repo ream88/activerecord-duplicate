@@ -12,7 +12,6 @@ ActsAsDuplicator::Railtie.insert
 class MiniTest::Spec
   before do
     ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
-    ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Schema.verbose = false
     
     # Anonymous record class
