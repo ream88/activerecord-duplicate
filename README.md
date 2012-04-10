@@ -1,24 +1,49 @@
-# ActsAsDuplicator
+Duplicating ActiveRecords is easy again. All you have to do:
 
-TODO: Write a gem description
+```ruby
+class Post < ActiveRecord::Base
+  attr_duplicatable :title, :content
+end
+
+post.duplicate
+```
+
+You want more controll? Check out this example:
+
+```ruby
+class Post < ActiveRecord::Base
+  # This attributes will be duplicated.
+  attr_duplicatable :title, :content
+  
+  # Don't duplicate if callback (on original object) returns false!
+  before_duplication(on: :original) { self.is_copyrighted? }
+  after_duplication(on: :original) { self.inform_author_about_duplicate! }
+  
+  after_duplication(on: :duplicate) { self.credit_author_in_content! }
+  
+  has_many :comments
+  has_many :tags
+end
+
+class Tag < ActiveRecord::Base
+  attr_duplicatable :tag
+end
+
+class Comment < ActiveRecord::Base
+  self.duplicatable = false
+end
+
+# Duplicates non-copyrighted posts and tags as well, but ignores comments.
+post.duplicate
+```
 
 ## Installation
 
-Add this line to your application's Gemfile:
+In your `Gemfile`:
 
-    gem 'acts_as_duplicator'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install acts_as_duplicator
-
-## Usage
-
-TODO: Write usage instructions here
+```ruby
+gem 'acts_as_duplicator'
+```
 
 ## Contributing
 
