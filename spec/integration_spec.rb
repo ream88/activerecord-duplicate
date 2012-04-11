@@ -4,7 +4,7 @@ describe 'Integration' do
   before do
     ActiveRecord::Schema.define do
       create_table :blogs
-            
+      
       create_table :posts do |t|
         t.belongs_to :blog
         t.string     :title
@@ -24,14 +24,24 @@ describe 'Integration' do
     end
     
     class Post < ActiveRecord::Base
-      belongs_to :blog
+      # Don't duplicate copyrighted posts
+      before_duplication { !self.is_copyrighted? }
+      after_duplication(:increase_counter, on: :duplicate)
       
+      belongs_to :blog
       has_many :comments
       
       attr_duplicatable :content
+      class_attribute :counter
       
-      # Don't duplicate copyrighted posts
-      before_duplication { !self.is_copyrighted? }
+      validates :title, presence: true, uniqueness: true
+      
+    private
+      def increase_counter
+        self.class.counter ||= 0
+        self.class.counter += 1
+        self.title = "Lorem #{self.class.counter}" 
+      end
     end
     
     class Comment < ActiveRecord::Base
@@ -54,7 +64,7 @@ describe 'Integration' do
 
 
     it 'duplicates posts too' do
-      3.times { blog.posts.create(content: 'Lorem') }
+      3.times { blog.posts.create }
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(3)
@@ -62,7 +72,7 @@ describe 'Integration' do
 
 
     it 'sets blog association' do
-      3.times { blog.posts.create(content: 'Lorem') }
+      3.times { blog.posts.create }
             
       subject.posts.each do |post|
         post.blog.must_equal(subject)
@@ -72,7 +82,7 @@ describe 'Integration' do
 
 
     it 'ignores empty posts' do
-      3.times { |i| blog.posts.create(content: 'Lorem', is_copyrighted: i == 0) }
+      3.times { |i| blog.posts.create(is_copyrighted: i == 0) }
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(2)
@@ -90,7 +100,7 @@ describe 'Integration' do
 
 
     it 'wont duplicate comments' do
-      post = blog.posts.create(content: 'Lorem')
+      post = blog.posts.create(title: 'Lorem')
       3.times { post.comments.create }
       
       post = subject.posts.first
