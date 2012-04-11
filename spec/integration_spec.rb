@@ -3,10 +3,8 @@ require File.expand_path('../spec_helper', __FILE__)
 describe 'Integration' do
   before do
     ActiveRecord::Schema.define do
-      create_table :blogs do |t|
-        t.string :title
-      end
-      
+      create_table :blogs
+            
       create_table :posts do |t|
         t.belongs_to :blog
         t.string     :title
@@ -22,7 +20,7 @@ describe 'Integration' do
     end
     
     class Blog < ActiveRecord::Base
-      has_many :posts
+      has_many :posts, inverse_of: :blog
     end
     
     class Post < ActiveRecord::Base
@@ -43,7 +41,7 @@ describe 'Integration' do
     end
   end
 
-  let(:blog) { Blog.create(title: 'Blog') }
+  let(:blog) { Blog.create }
 
   describe 'duplicating blog' do
     subject { blog.duplicate }
@@ -60,6 +58,16 @@ describe 'Integration' do
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(3)
+    end
+
+
+    it 'sets blog association' do
+      3.times { blog.posts.create(content: 'Lorem') }
+            
+      subject.posts.each do |post|
+        post.blog.must_equal(subject)
+        post.blog_id.must_be_nil
+      end
     end
 
 

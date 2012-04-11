@@ -9,6 +9,8 @@ module ActiveRecord
         class_attribute :_duplicatable_attributes
         class_attribute :_duplicatable
         
+        attr_accessor :duplication_parent
+                
         include ActiveRecord::Acts::Duplicator::Callbacks
       end
 
@@ -35,17 +37,24 @@ module ActiveRecord
           end
           
           # Duplicate all belongs_to associations.
-          self.class.reflect_on_all_associations(:belongs_to).each do |association|
-            duplicate.send(:"#{association.name}=", send(association.name))
-          end
+           self.class.reflect_on_all_associations(:belongs_to).each do |association|
+             if duplication_parent.is_a?(association.klass)
+               duplicate.send(:"#{association.name}=", duplication_parent)
+               duplicate.send(:"#{association.name}_id=", nil)
+             else
+               duplicate.send(:"#{association.name}=", send(association.name))
+             end
+           end
           
           # Duplicate all has_many associations.
           self.class.reflect_on_all_associations(:has_many).each do |association|
-            send(association.name).all.to_a.each do |object|
-              object.duplicate.tap do |object|
-                duplicate.send(association.name) << object if object
-              end
-            end
+            duplicate.send(:"#{association.name}=", send(association.name).map do |object|
+              object.duplication_parent = duplicate
+              object = object.duplicate
+              next unless object.present?
+              
+              object
+            end.compact)
           end
         end
       end
