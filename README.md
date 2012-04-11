@@ -14,9 +14,6 @@ You want more controll? Check out this example:
 
 ```ruby
 class Post < ActiveRecord::Base
-  # This attributes will be duplicated.
-  attr_duplicatable :title, :content
-  
   # Don't duplicate if callback (on original object) returns false!
   before_duplication(on: :original) { self.is_copyrighted? }
   after_duplication(on: :original) { self.inform_author_about_duplicate! }
@@ -25,6 +22,9 @@ class Post < ActiveRecord::Base
   
   has_many :comments
   has_many :tags
+  
+  # This attributes will be duplicated.
+  attr_duplicatable :title, :content
 end
 
 class Tag < ActiveRecord::Base
