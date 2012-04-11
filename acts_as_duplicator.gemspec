@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name          = 'acts_as_duplicator'
-  gem.version       = '0.1.2'
+  gem.version       = '0.2.0'
   gem.authors       = 'Mario Uher'
   gem.email         = 'uher.mario@gmail.com'
   gem.description   = gem.summary = 'Duplicating ActiveRecords is easy again.'
