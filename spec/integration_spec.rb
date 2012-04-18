@@ -17,6 +17,12 @@ describe 'Integration' do
         t.belongs_to :post
         t.text       :content
       end
+      
+      create_table :ratings do |t|
+        t.belongs_to :parent
+        t.string     :parent_type
+        t.integer    :value
+      end
     end
     
     class Blog < ActiveRecord::Base
@@ -30,6 +36,7 @@ describe 'Integration' do
       
       belongs_to :blog
       has_many :comments
+      has_many :ratings, as: :parent
       
       attr_duplicatable :content
       class_attribute :counter
@@ -48,6 +55,11 @@ describe 'Integration' do
       self.duplicatable = false
       
       belongs_to :post
+      has_many :ratings, as: :parent
+    end
+    
+    class Rating < ActiveRecord::Base
+      belongs_to :parent, polymorphic: true
     end
   end
 
@@ -64,16 +76,28 @@ describe 'Integration' do
 
 
     it 'duplicates posts too' do
-      3.times { blog.posts.create }
+      3.times do |i|
+        post = blog.posts.create(title: "Post #{i}")
+        rating = post.ratings.create(value: 5)
+      end
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(3)
+      
+      subject.save
+      
+      Blog.count.must_equal(2)
+      Post.count.must_equal(6)
+      Rating.count.must_equal(6)
     end
 
 
     it 'sets blog association' do
-      3.times { blog.posts.create }
-            
+      3.times do |i|
+        post = blog.posts.create(title: "Post #{i}")
+        rating = post.ratings.create(value: 5)
+      end
+      
       subject.posts.each do |post|
         post.blog.must_equal(subject)
         post.blog_id.must_be_nil
@@ -81,16 +105,26 @@ describe 'Integration' do
     end
 
 
-    it 'ignores empty posts' do
-      3.times { |i| blog.posts.create(is_copyrighted: i == 0) }
+    it 'ignores copyrighted posts' do
+      3.times do |i|
+        post = blog.posts.create(title: "Post #{i}", is_copyrighted: i == 0)
+        rating = post.ratings.create(value: 5)
+      end
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(2)
+      
+      subject.save
+      
+      Blog.count.must_equal(2)
+      Post.count.must_equal(5)
+      Rating.count.must_equal(5)
     end
 
 
     it 'ignores posts copyright flag' do
-      post = blog.posts.create(content: 'Lorem', published_at: Time.now)
+      post = blog.posts.create(title: 'Post', content: 'Lorem', published_at: Time.now)
+      rating = post.ratings.create(value: 5)
       
       post = subject.posts.first
       post.wont_be_nil
@@ -100,12 +134,20 @@ describe 'Integration' do
 
 
     it 'wont duplicate comments' do
-      post = blog.posts.create(title: 'Lorem')
+      post = blog.posts.create(title: 'Post')
+      rating = post.ratings.create(value: 5)
       3.times { post.comments.create }
       
       post = subject.posts.first
       post.wont_be_nil
       post.comments.size.must_equal(0)
+      
+      subject.save
+      
+      Blog.count.must_equal(2)
+      Post.count.must_equal(2)
+      Rating.count.must_equal(2)
+      Comment.count.must_equal(3)
     end
   end
 
