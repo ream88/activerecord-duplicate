@@ -3,7 +3,7 @@ module ActiveRecord::Duplicate
     require 'rails'
 
     class Railtie < Rails::Railtie
-      initializer 'active_record-duplicate.insert_into_active_record' do
+      initializer 'activerecord-duplicate.insert_into_active_record' do
         ActiveSupport.on_load(:active_record) do
           ActiveRecord::Duplicate::Railtie.insert
         end
