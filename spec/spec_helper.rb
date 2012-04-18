@@ -4,8 +4,8 @@ require 'minitest/autorun'
 require 'minitest/spec'
 require 'purdytest'
 require 'active_record'
-require 'active_record-duplicate'
-require 'active_record-duplicate/railtie'
+require 'activerecord-duplicate'
+require 'activerecord-duplicate/railtie'
 
 ActiveRecord::Duplicate::Railtie.insert
 

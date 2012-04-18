@@ -1,4 +1,4 @@
-require 'active_record-duplicate/active_record/duplicate/callbacks'
+require 'activerecord-duplicate/active_record/duplicate/callbacks'
 
 module ActiveRecord
   module Duplicate
