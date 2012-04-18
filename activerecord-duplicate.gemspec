@@ -1,10 +1,10 @@
 Gem::Specification.new do |gem|
-  gem.name          = 'active_record-duplicate'
-  gem.version       = '0.3.0'
+  gem.name          = 'activerecord-duplicate'
+  gem.version       = '0.4.0'
   gem.authors       = 'Mario Uher'
   gem.email         = 'uher.mario@gmail.com'
   gem.description   = gem.summary = 'Duplicating ActiveRecords is easy again.'
-  gem.homepage      = 'https://github.com/haihappen/active_record-duplicate'
+  gem.homepage      = 'https://github.com/haihappen/activerecord-duplicate'
 
   gem.files         = `git ls-files`.split("\n")
   gem.require_path  = 'lib'
