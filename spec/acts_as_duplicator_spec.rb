@@ -18,11 +18,13 @@ describe ActiveRecord::Duplicate do
   end
 
 
-  describe :duplicatable do
+  describe 'before_duplication { false }' do
     it 'marks associations as non-duplicatable' do
-      klass.duplicatable = false
+      klass.instance_eval do
+        before_duplication { false }
+      end
       
-      klass.duplicatable.must_equal(false)
+      klass.new.duplicate.must_equal(false)
     end
   end
 

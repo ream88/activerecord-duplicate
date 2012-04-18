@@ -52,7 +52,7 @@ describe 'Integration' do
     end
     
     class Comment < ActiveRecord::Base
-      self.duplicatable = false
+      before_duplication { false }
       
       belongs_to :post
       has_many :ratings, as: :parent

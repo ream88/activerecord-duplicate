@@ -6,16 +6,13 @@ module ActiveRecord
 
     included do
       class_attribute :_duplicatable_attributes
-      class_attribute :_duplicatable
       
       attr_accessor :duplication_parent
       
       include ActiveRecord::Duplicate::Callbacks
     end
 
-    def duplicate
-      return unless self.class.duplicatable
-      
+    def duplicate      
       dup.tap do |duplicate|
         attributes.each do |key, value|
           value = case true
@@ -66,15 +63,6 @@ module ActiveRecord
       def attr_duplicatable(*attributes)
         self._duplicatable_attributes = attributes.map(&:to_sym) if attributes.present?
         self._duplicatable_attributes || []
-      end
-
-      def duplicatable=(duplicatable)
-        self._duplicatable = duplicatable unless duplicatable.nil?
-        self.duplicatable
-      end
-
-      def duplicatable
-        self._duplicatable.nil? ? true : !!self._duplicatable
       end
     end
   end

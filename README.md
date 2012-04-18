@@ -32,7 +32,7 @@ class Tag < ActiveRecord::Base
 end
 
 class Comment < ActiveRecord::Base
-  self.duplicatable = false
+  before_duplication { false }
 end
 
 # Duplicates non-copyrighted posts and tags as well, but ignores comments.
