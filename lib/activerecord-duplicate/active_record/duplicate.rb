@@ -32,29 +32,31 @@ module ActiveRecord
           duplicate.send(:"#{key}=", value)
         end
         
-        # Duplicate all belongs_to associations.
-         self.class.reflect_on_all_associations(:belongs_to).each do |association|
-           association = self.association(association.name)
-           
-           if duplication_parent.is_a?(association.klass)
-             duplicate.send(:"#{association.reflection.name}=", duplication_parent)
-             duplicate.send(:"#{association.reflection.name}_id=", nil)
-           else
-             duplicate.send(:"#{association.reflection.name}=", send(association.reflection.name))
-           end
-         end
-        
-        # Duplicate all has_many associations.
-        self.class.reflect_on_all_associations(:has_many).each do |association|
+        self.class.reflect_on_all_associations.each do |association|
+          name = association.name
+          macro = association.macro
           association = self.association(association.name)
           
-          duplicate.send(:"#{association.reflection.name}=", send(association.reflection.name).map do |object|
-            object.duplication_parent = duplicate
-            object = object.duplicate
-            next unless object.present?
-            
-            object
-          end.compact)
+          case macro
+          when :belongs_to
+            # Duplicate all belongs_to associations.
+            if duplication_parent.is_a?(association.klass)
+              duplicate.send(:"#{name}=", duplication_parent)
+              duplicate.send(:"#{name}_id=", nil)
+            else
+              duplicate.send(:"#{name}=", send(name))
+            end
+          
+          when :has_many
+            # Duplicate all has_many associations.
+            duplicate.send(:"#{name}=", send(name).map do |object|
+              object.duplication_parent = duplicate
+              object = object.duplicate
+              next unless object.present?
+              
+              object
+            end.compact)
+          end
         end
       end
     end
