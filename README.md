@@ -1,4 +1,4 @@
-## active_record-duplicate [![Build Status](https://secure.travis-ci.org/haihappen/active_record-duplicate.png)](http://travis-ci.org/haihappen/active_record-duplicate)
+## activerecord-duplicate [![Build Status](https://secure.travis-ci.org/haihappen/activerecord-duplicate.png)](http://travis-ci.org/haihappen/activerecord-duplicate)
 
 Duplicating ActiveRecords is easy again. All you have to do:
 
@@ -46,7 +46,7 @@ Tested against Ruby versions `1.9.2`, `1.9.3`, `ruby-head` and Rails versions `3
 In your `Gemfile`:
 
 ```ruby
-gem 'active_record-duplicate'
+gem 'activerecord-duplicate'
 ```
 
 ## Contributing
