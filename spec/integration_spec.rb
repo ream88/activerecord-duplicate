@@ -63,7 +63,9 @@ describe 'Integration' do
     end
   end
 
+
   let(:blog) { Blog.create }
+
 
   describe 'duplicating blog' do
     subject { blog.duplicate }

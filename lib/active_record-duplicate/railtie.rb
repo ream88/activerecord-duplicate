@@ -1,11 +1,11 @@
-module ActsAsDuplicator
+module ActiveRecord::Duplicate
   if defined?(Rails::Railtie)
     require 'rails'
 
     class Railtie < Rails::Railtie
-      initializer 'acts_as_duplicator.insert_into_active_record' do
+      initializer 'active_record-duplicate.insert_into_active_record' do
         ActiveSupport.on_load(:active_record) do
-          ActsAsDuplicator::Railtie.insert
+          ActiveRecord::Duplicate::Railtie.insert
         end
       end
     end
@@ -14,7 +14,7 @@ module ActsAsDuplicator
   class Railtie
     def self.insert
       if defined?(ActiveRecord)
-        ActiveRecord::Base.send(:include, ActiveRecord::Acts::Duplicator)
+        ActiveRecord::Base.send(:include, ActiveRecord::Duplicate)
       end
     end
   end

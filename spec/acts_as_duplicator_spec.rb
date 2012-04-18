@@ -1,7 +1,8 @@
 require File.expand_path('../spec_helper', __FILE__)
 
-describe ActiveRecord::Acts::Duplicator do
+describe ActiveRecord::Duplicate do
   let(:klass) { Class.new(ActiveRecord::Base) { self.table_name = 'records' } }
+
 
   describe :attr_duplicatable do
     it 'allows you to whitelist attributes' do

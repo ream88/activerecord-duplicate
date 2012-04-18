@@ -1,6 +1,6 @@
 require File.expand_path('../spec_helper', __FILE__)
 
-describe ActiveRecord::Acts::Duplicator::Callbacks do
+describe ActiveRecord::Duplicate::Callbacks do
   let(:klass) { Class.new(ActiveRecord::Base) { self.table_name = 'records' } }
 
 

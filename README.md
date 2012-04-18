@@ -1,4 +1,4 @@
-## acts_as_duplicator [![Build Status](https://secure.travis-ci.org/haihappen/acts_as_duplicator.png)](http://travis-ci.org/haihappen/acts_as_duplicator)
+## active_record-duplicate [![Build Status](https://secure.travis-ci.org/haihappen/active_record-duplicate.png)](http://travis-ci.org/haihappen/active_record-duplicate)
 
 Duplicating ActiveRecords is easy again. All you have to do:
 
@@ -23,7 +23,7 @@ class Post < ActiveRecord::Base
   has_many :comments
   has_many :tags
   
-  # This attributes will be duplicated.
+  # These attributes will be duplicated.
   attr_duplicatable :title, :content
 end
 
@@ -46,7 +46,7 @@ Tested against Ruby versions `1.9.2`, `1.9.3`, `ruby-head` and Rails versions `3
 In your `Gemfile`:
 
 ```ruby
-gem 'acts_as_duplicator'
+gem 'active_record-duplicate'
 ```
 
 ## Contributing

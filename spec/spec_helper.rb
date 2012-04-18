@@ -4,10 +4,10 @@ require 'minitest/autorun'
 require 'minitest/spec'
 require 'purdytest'
 require 'active_record'
-require 'acts_as_duplicator'
-require 'acts_as_duplicator/railtie'
+require 'active_record-duplicate'
+require 'active_record-duplicate/railtie'
 
-ActsAsDuplicator::Railtie.insert
+ActiveRecord::Duplicate::Railtie.insert
 
 class MiniTest::Spec
   before do
