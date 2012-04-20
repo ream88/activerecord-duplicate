@@ -1,6 +1,6 @@
 require File.expand_path('../spec_helper', __FILE__)
 
-describe ActiveRecord::Duplicate::Callbacks do
+describe ActiveRecord::Duplicate do
   let(:klass) { Class.new(ActiveRecord::Base) { self.table_name = 'records' } }
 
 
@@ -16,7 +16,7 @@ describe ActiveRecord::Duplicate::Callbacks do
     mock.expect(:after_duplication, nil, [:original])
     mock.expect(:before_duplication, nil, [:duplicate])
     mock.expect(:after_duplication, nil, [:duplicate])
-        
+    
     klass.create.duplicate
     mock.verify
   end

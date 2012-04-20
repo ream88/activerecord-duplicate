@@ -32,23 +32,16 @@ describe 'Integration' do
     class Post < ActiveRecord::Base
       # Don't duplicate copyrighted posts
       before_duplication { !self.is_copyrighted? }
-      after_duplication(:increase_counter, on: :duplicate)
+      after_duplication(on: :duplicate) { self.title = title.match(/\d+$/) ? title.succ : "#{title} 2" }
       
       belongs_to :blog
       has_many :comments
       has_many :ratings, as: :parent
       
-      attr_duplicatable :content
+      attr_duplicatable :title, :content
       class_attribute :counter
       
       validates :title, presence: true, uniqueness: true
-      
-    private
-      def increase_counter
-        self.class.counter ||= 0
-        self.class.counter += 1
-        self.title = "Lorem #{self.class.counter}" 
-      end
     end
     
     class Comment < ActiveRecord::Base
@@ -64,7 +57,7 @@ describe 'Integration' do
   end
 
 
-  let(:blog) { Blog.create }
+  let(:blog) { Blog.create! }
 
 
   describe 'duplicating blog' do
@@ -78,15 +71,15 @@ describe 'Integration' do
 
 
     it 'duplicates posts too' do
-      3.times do |i|
-        post = blog.posts.create(title: "Post #{i}")
-        rating = post.ratings.create(value: 5)
+      %w[Sample Blog Post].each do |title|
+        post = blog.posts.create!(title: title)
+        rating = post.ratings.create!(value: 5)
       end
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(3)
       
-      subject.save
+      subject.save!
       
       Blog.count.must_equal(2)
       Post.count.must_equal(6)
@@ -95,28 +88,30 @@ describe 'Integration' do
 
 
     it 'sets blog association' do
-      3.times do |i|
-        post = blog.posts.create(title: "Post #{i}")
-        rating = post.ratings.create(value: 5)
+      %w[Sample Blog Post].each do |title|
+        post = blog.posts.create!(title: title)
+        rating = post.ratings.create!(value: 5)
       end
       
       subject.posts.each do |post|
         post.blog.must_equal(subject)
         post.blog_id.must_be_nil
       end
+      
+      subject.save!
     end
 
 
     it 'ignores copyrighted posts' do
-      3.times do |i|
-        post = blog.posts.create(title: "Post #{i}", is_copyrighted: i == 0)
-        rating = post.ratings.create(value: 5)
+      %w[Sample Blog Post].each do |title|
+        post = blog.posts.create!(title: title, is_copyrighted: title == 'Sample')
+        rating = post.ratings.create!(value: 5)
       end
       
       subject.posts.all?(&:new_record?).must_equal(true)
       subject.posts.size.must_equal(2)
       
-      subject.save
+      subject.save!
       
       Blog.count.must_equal(2)
       Post.count.must_equal(5)
@@ -124,27 +119,29 @@ describe 'Integration' do
     end
 
 
-    it 'ignores posts copyright flag' do
-      post = blog.posts.create(title: 'Post', content: 'Lorem', published_at: Time.now)
-      rating = post.ratings.create(value: 5)
+    it 'ignores posts published_at timestamp' do
+      post = blog.posts.create!(title: 'Post', content: 'Lorem', published_at: Time.now)
+      rating = post.ratings.create!(value: 5)
       
       post = subject.posts.first
       post.wont_be_nil
       post.content.must_equal('Lorem')
       post.published_at.must_be_nil
+      
+      subject.save!
     end
 
 
     it 'wont duplicate comments' do
-      post = blog.posts.create(title: 'Post')
-      rating = post.ratings.create(value: 5)
-      3.times { post.comments.create }
+      post = blog.posts.create!(title: 'Post')
+      rating = post.ratings.create!(value: 5)
+      3.times { post.comments.create! }
       
       post = subject.posts.first
       post.wont_be_nil
       post.comments.size.must_equal(0)
       
-      subject.save
+      subject.save!
       
       Blog.count.must_equal(2)
       Post.count.must_equal(2)
@@ -156,9 +153,10 @@ describe 'Integration' do
 
   describe 'duplicating post' do
     it 'sets blog association' do
-      post = blog.posts.create
+      post = blog.posts.create!(title: 'Post')
       
       post = post.duplicate
+      post.save!
       
       post.blog.must_equal(blog)
     end
