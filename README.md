@@ -4,13 +4,12 @@ Duplicating ActiveRecords is easy again. All you have to do:
 
 ```ruby
 class Post < ActiveRecord::Base
-  attr_duplicatable :title, :content
 end
 
 post.duplicate
 ```
 
-You want more controll? Check out this example:
+You want more control? Check out this example:
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -23,16 +22,17 @@ class Post < ActiveRecord::Base
   has_many :comments
   has_many :tags
   
-  # These attributes will be duplicated.
-  attr_duplicatable :title, :content
+  # Only these attributes and associations will be duplicated.
+  attr_duplicatable :title, :content, :tags
 end
 
 class Tag < ActiveRecord::Base
-  attr_duplicatable :tag
+  belongs_to :post
+  
+  attr_duplicatable :tag, :post
 end
 
 class Comment < ActiveRecord::Base
-  before_duplication { false }
 end
 
 # Duplicates non-copyrighted posts and tags as well, but ignores comments.

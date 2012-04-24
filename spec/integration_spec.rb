@@ -24,11 +24,13 @@ describe 'Integration' do
         t.integer    :value
       end
     end
-    
+
     class Blog < ActiveRecord::Base
       has_many :posts, inverse_of: :blog
+      
+      attr_duplicatable :posts
     end
-    
+
     class Post < ActiveRecord::Base
       # Don't duplicate copyrighted posts
       before_duplication { !self.is_copyrighted? }
@@ -38,21 +40,22 @@ describe 'Integration' do
       has_many :comments
       has_many :ratings, as: :parent
       
-      attr_duplicatable :title, :content
-      class_attribute :counter
+      attr_duplicatable :title, :content, :blog, :ratings
       
       validates :title, presence: true, uniqueness: true
     end
-    
+
     class Comment < ActiveRecord::Base
-      before_duplication { false }
-      
       belongs_to :post
       has_many :ratings, as: :parent
+      
+      attr_duplicatable :ratings, :post
     end
-    
+
     class Rating < ActiveRecord::Base
       belongs_to :parent, polymorphic: true
+      
+      attr_duplicatable :parent
     end
   end
 

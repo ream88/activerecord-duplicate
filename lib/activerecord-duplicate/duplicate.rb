@@ -18,7 +18,7 @@ module ActiveRecord::Duplicate
             value = case true
             
             # Duplicate attribute if whitelisted
-            when self.class.attr_duplicatable.include?(key.to_sym)
+            when self.class.attr_duplicatable?(key)
               value
             
             # If not whitelisted, set to default value
@@ -34,6 +34,8 @@ module ActiveRecord::Duplicate
           
           self.class.reflect_on_all_associations.each do |association|
             name = association.name
+            
+            next unless self.class.attr_duplicatable?(name)
             macro = association.macro
             association = self.association(association.name)
             
@@ -66,7 +68,12 @@ module ActiveRecord::Duplicate
   module ClassMethods
     def attr_duplicatable(*attributes)
       self._duplicatable_attributes = attributes.map(&:to_sym) if attributes.present?
-      self._duplicatable_attributes || []
+      self._duplicatable_attributes
+    end
+
+    def attr_duplicatable?(attribute)
+      attribute = attribute.to_sym
+      attr_duplicatable.present? ? attr_duplicatable.include?(attribute) : primary_key.to_sym != attribute
     end
 
     # Duplicated from activemodel/lib/active_model/validations/callbacks.rb
