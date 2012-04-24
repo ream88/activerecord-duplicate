@@ -1,4 +1,4 @@
-## activerecord-duplicate [![Build Status](https://secure.travis-ci.org/haihappen/activerecord-duplicate.png)](http://travis-ci.org/haihappen/activerecord-duplicate)
+# activerecord-duplicate [![Build Status](https://secure.travis-ci.org/haihappen/activerecord-duplicate.png)](http://travis-ci.org/haihappen/activerecord-duplicate)
 
 Duplicating ActiveRecords is easy again. All you have to do:
 
