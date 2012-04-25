@@ -7,9 +7,11 @@ describe 'Integration' do
       
       create_table :posts do |t|
         t.belongs_to :blog
+        t.string     :type
         t.string     :title
         t.text       :content
         t.boolean    :is_copyrighted
+        t.string     :url
         t.timestamp  :published_at
       end
       
@@ -40,9 +42,17 @@ describe 'Integration' do
       has_many :comments
       has_many :ratings, as: :parent
       
-      attr_duplicatable :title, :content, :blog, :ratings
+      attr_duplicatable :title, :blog, :ratings
       
       validates :title, presence: true, uniqueness: true
+      
+      class Video < Post
+        attr_duplicatable :url
+      end
+      
+      class Text < Post
+        attr_duplicatable :content
+      end
     end
 
     class Comment < ActiveRecord::Base
@@ -90,6 +100,21 @@ describe 'Integration' do
     end
 
 
+    it 'works with STI classes too' do
+      blog.posts << Post::Video.new(title: 'My Video Post', url: 'http://youtube.com')
+      blog.posts << Post::Text.new(title: 'My Text Post', content: 'text')
+      
+      Post.attr_duplicatable.must_equal([:title, :blog, :ratings])
+      Post::Video.attr_duplicatable.must_equal([:title, :blog, :ratings, :url])
+      Post::Text.attr_duplicatable.must_equal([:title, :blog, :ratings, :content])
+      
+      subject.save!
+      
+      Blog.count.must_equal(2)
+      Post.count.must_equal(4)
+    end
+
+
     it 'sets blog association' do
       %w[Sample Blog Post].each do |title|
         post = blog.posts.create!(title: title)
@@ -123,12 +148,11 @@ describe 'Integration' do
 
 
     it 'ignores posts published_at timestamp' do
-      post = blog.posts.create!(title: 'Post', content: 'Lorem', published_at: Time.now)
+      post = blog.posts.create!(title: 'Post', published_at: Time.now)
       rating = post.ratings.create!(value: 5)
       
       post = subject.posts.first
       post.wont_be_nil
-      post.content.must_equal('Lorem')
       post.published_at.must_be_nil
       
       subject.save!

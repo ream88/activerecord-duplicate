@@ -67,7 +67,8 @@ module ActiveRecord::Duplicate
 
   module ClassMethods
     def attr_duplicatable(*attributes)
-      self._duplicatable_attributes = attributes.map(&:to_sym) if attributes.present?
+      self._duplicatable_attributes ||= []
+      self._duplicatable_attributes = _duplicatable_attributes | attributes.map(&:to_sym) if attributes.present?
       self._duplicatable_attributes
     end
 

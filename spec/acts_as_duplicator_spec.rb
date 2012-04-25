@@ -23,6 +23,24 @@ describe ActiveRecord::Duplicate do
       
       klass.attr_duplicatable.must_equal([:created_at, :updated_at])
     end
+
+
+    it 'allows multiple calls' do
+      klass.attr_duplicatable(:created_at)
+      klass.attr_duplicatable(:updated_at)
+      
+      klass.attr_duplicatable.must_equal([:created_at, :updated_at])
+    end
+
+
+    it '' do
+      klass.attr_duplicatable(:created_at)
+      
+      sti_klass = Class.new(klass)
+      sti_klass.attr_duplicatable(:updated_at)
+      
+      sti_klass.attr_duplicatable.must_equal([:created_at, :updated_at])
+    end
   end
 
 
