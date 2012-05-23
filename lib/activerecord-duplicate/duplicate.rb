@@ -13,6 +13,7 @@ module ActiveRecord::Duplicate
       self.run_callbacks(:duplication) do
       dup.tap do |duplicate|
         duplicate.duplication_context = :duplicate
+        duplicate.duplication_parent = self
         duplicate.run_callbacks(:duplication) do
           attributes.each do |key, value|
             value = case true
