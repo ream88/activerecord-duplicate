@@ -59,6 +59,13 @@ module ActiveRecord::Duplicate
                 
                 object
               end.compact)
+            
+            when :has_one
+              # Duplicate all has_one associations.
+              object = send(name)
+              object.duplication_parent = duplicate
+              object = object.duplicate
+              duplicate.send(:"#{name}=", object) if object.present?
             end
           end
         end
